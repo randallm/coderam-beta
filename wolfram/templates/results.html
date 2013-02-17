@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Coderam Beta</title>
+    <style>
+        body {
+            width: 760px;
+            margin-left: auto;
+            margin-right: auto;
+            font-family: 'Droid Serif', serif;
+            font-size: 30px;
+        }
+
+        img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .projectLinks {
+            display: inline-block;
+            border: 1px solid black;
+            width: 100px;
+            height: 100px;
+        }
+
+        td:first-child {
+            font-weight: bold;
+        }
+
+        table {
+            padding: 1em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>JQuery</h1>
+
+    <div>
+        <div class="projectLinks">
+            <img src="http://www.levihackwith.com/wp-content/uploads/2011/10/github-logo.png">
+        </div>
+
+        <div class="projectLinks">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png">
+        </div>
+    </div>
+
+    <h2>Languages</h2>
+    <canvas id="langCanvas"></canvas>
+
+    <h2>License</h2>
+    <table>
+        <tr>
+            <td>Name</td>
+            <td>Apache License 2.0</td>
+        </tr>
+        <tr>
+            <td>Author</td>
+            <td>Randall Ma</td>
+        </tr>
+    </table>
+
+</body>
+
+    <script>
+        var c = document.getElementById("langCanvas")
+        var ctx = c.getContext("2d")
+        ctx.font = '30px Droid Serif'
+
+
+        var textWidth = ctx.measureText("JavaScript").width;
+        var maxTextWidth;
+        var textHeightOffset = 30 / 2;
+
+
+        // str, x, y
+        // ctx.fillText('PHP', 0, textYPos)
+
+        // x, y, w, h
+        // ctx.fillRect(textWidth + 10, textHeightOffset, 50, 10)
+
+        var textYPos = 30;
+        {% for lang, value in languages.iteritems() %}
+            ctx.fillText("{{ lang }}", 0, textYPos)
+            ctx.fillStyle = "rgb(200, 200, 200)"
+            ctx.fillRect(textWidth + 10, textYPos - textHeightOffset, 100, 10)
+            ctx.fillStyle = "rgb(0, 0, 0)"
+            ctx.fillRect(textWidth + 10, textYPos - textHeightOffset, {{ value }}, 10)
+            textYPos += 30;
+        {% endfor %}
+
+    </script>
+
+</html>
