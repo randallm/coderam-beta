@@ -98,29 +98,41 @@ def get_languages(author, project):
 
 
 def get_license(author, project):
+    def check_license(license):
+        if 'GNU Lesser General Public License' in license:
+            return 'LGPL'
+        elif 'GNU General Public License' in license:
+            return 'GPL'
+        elif 'Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.' in license:
+            return 'ISC'
+        elif 'Redistribution and use in source and binary forms, with or without' in license:
+            return 'BSD'
+        elif 'Permission is hereby granted, free of charge, to any person obtaining' in license:
+            return 'MIT'
+        elif 'Apache License' in license:
+            return 'Apache 2.0'
+        elif 'Version 2.0' in license:
+            return 'Apache 2.0'
+        elif 'Artistic License 2.0' in license:
+            return 'Artistic'
+        else:
+            return False
+
     r = requests.get(GH + '/repos/' + author + '/' + project + '/contents' + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
     for f in r.json():
         if 'license' in f.get('name').lower():
             r2 = requests.get(GH + '/repos/' + author + '/' + project + '/contents/' + f.get('name') + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
             license = b64decode(r2.json().get('content') + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+            if check_license(license):
+                return check_license(license)
 
-            if 'GNU Lesser General Public License' in license:
-                return 'LGPL'
-            elif 'GNU General Public License' in license:
-                return 'GPL'
-            elif 'Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted, provided that the above copyright notice and this permission notice appear in all copies.' in license:
-                return 'ISC'
-            elif 'Redistribution and use in source and binary forms, with or without' in license:
-                return 'BSD'
-            elif 'Permission is hereby granted, free of charge, to any person obtaining' in license:
-                return 'MIT'
-            elif 'Version 2.0, January 2004' in license:
-                return 'Apache 2.0'
-            elif 'Artistic License 2.0' in license:
-                return 'Artistic'
-            else:
-                return False
-    return False
+        if 'readme' in f.get('name').lower():
+            r2 = requests.get(GH + '/repos/' + author + '/' + project + '/contents/' + f.get('name') + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+            license = b64decode(r2.json().get('content') + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+            if check_license(license):
+                return check_license(license)
+
+    return 'Unknown'
 
 
 # Repo Activity API
