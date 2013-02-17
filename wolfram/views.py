@@ -142,31 +142,62 @@ def get_commit_history(author, project, commit_since):
         date_boundary = datetime.datetime.utcnow() - datetime.timedelta(days=7)
     elif commit_since == 'month':
         date_boundary = datetime.datetime.utcnow() + relativedelta(months=-1)
-    elif commit_since == 'year':
-        date_boundary = datetime.datetime.utcnow() + relativedelta(years=-1)
+    elif commit_since == '6mo':
+        date_boundary = datetime.datetime.utcnow() + relativedelta(months=-6)
     date_boundary = date_boundary.isoformat()
 
-    page = 1
+    urls = []
+    url = 'https://api.github.com/repos/' + author + '/' + project + '/commits?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74&since=' + date_boundary + '&page=1&per_page=100'
+
+    def scrape_urls(url):
+        r = requests.head(url=url)
+        if not r.headers['link']:
+            urls.append(url)
+            return None
+        next_page_str_pos = r.headers['link'].find('>; rel="next"')
+        if next_page_str_pos == -1:
+            return None
+        url = r.headers['link'][1:next_page_str_pos]
+        urls.append(url)
+        scrape_urls(url)
+
+    scrape_urls(url)
+
+    # demons lie below this line:
+
     commits = 0
     commit_authors = []
 
-    def count_commits(page, commits, commit_authors, latest_commit_hash=None):
-        # PLEASE PLEASE PLEASE!!!!!!!!:
-        # refresh yourself on how python scoping works or this will fuck you over badly
-        r = requests.get(GH + '/repos/' + author + '/' + project + '/commits?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74&since' + date_boundary + '&page=' + str(page) + '&per_page=100')
-
-        new_latest_commit_hash = r.json().get('sha')
-        # github api doesn't error out if you pick a page that doesn't exist
-        if latest_commit_hash == new_latest_commit_hash:
-            return (commits, len(commit_authors))
+    for u in urls:
+        r = requests.get(u)
 
         commits += len(r.json())
-        for commit_author in r.json().get('author'):
-            if commit_author.get('login') not in commit_authors:
-                commit_authors.append(commit_author.get('login'))
 
-        if len(r.json()) == 100:
-            page += 1
-            count_commits(page, commits, commit_authors, new_latest_commit_hash)
+        # for commit in r.json():
+        #     commit_author = commit.get('author')
+        #     commit_author = commit_author.get('login')
+        #     if commit_author not in commit_authors:
+        #         commit_authors.append(commit_author)
 
-    count_commits(page, commits, commit_authors)
+    # return commits, commit_authors
+
+    return commits
+
+    # for u in urls:
+        # r = requests.get(u)
+    #     new_latest_commit_hash = r.json()[0].get('sha')
+    #     # github api doesn't error out if you pick a page that doesn't exist
+    #     if latest_commit_hash == new_latest_commit_hash:
+    #         return (commits, len(commit_authors))
+
+    #     latest_commit_hash = new_latest_commit_hash
+
+    #     commits += len(r.json())
+    #     for commit in r.json():
+    #         commit_author = commit.get('author')
+    #         commit_author = commit.get('login')
+    #         if commit_author not in commit_authors:
+    #             commit_authors.append(commit_author)
+
+    #     else:
+    #         return (commits, len(commit_authors))
