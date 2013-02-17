@@ -8,7 +8,7 @@
             margin-left: auto;
             margin-right: auto;
             font-family: 'Droid Serif', serif;
-            font-size: 30px;
+            font-size: 16px;
         }
 
         img {
@@ -18,9 +18,12 @@
 
         .projectLinks {
             display: inline-block;
-            border: 1px solid black;
             width: 100px;
             height: 100px;
+        }
+
+        td {
+            padding-right: 1em;
         }
 
         td:first-child {
@@ -35,62 +38,68 @@
 </head>
 <body>
 
-    <h1>JQuery</h1>
+    <h1>{{ metadata.name }}</h1>
+    <small>{{ metadata.description }}</small>
+
+    <h2>General</h2>
+
+    <table>
+        <tr>
+            <td>Creation Date</td>
+            <td>{{ metadata.creation_date }}</td>
+        </tr>
+        <tr>
+            <td>Forks</td>
+            <td>{{ metadata.forks }} forks</td>
+        </tr>
+    </table>
 
     <div>
         <div class="projectLinks">
-            <img src="http://www.levihackwith.com/wp-content/uploads/2011/10/github-logo.png">
+            <a href="{{ metadata.html_url }}">
+                <img src="http://www.levihackwith.com/wp-content/uploads/2011/10/github-logo.png">
+            </a>
         </div>
 
+        {% if metadata.homepage %}
         <div class="projectLinks">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png">
+            <a class="projectLinks" href="{{ metadata.homepage }}">
+                <img src="http://i.imgur.com/07G0Ha0.png">
+            </a>
         </div>
+        {% endif %}
+
+        {% if wikipedia_url %}
+        <div class="projectLinks">
+            <a href="{{ wikipedia_url }}">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png">
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <h2>Commit Activity</h2>
+
+    <div>
+        {% set color = 333 %}
+        {# whitespace affects inline-block adding up to 100% #}
+        {% for percent in commits.0 %}{% if percent %}<div style="width:{{ percent * 100 }}%; height:30px; display:inline-block; background-color:#{{ color }}"></div>{% set color = color + 333 %}{% endif %}{% endfor %}
     </div>
 
     <h2>Languages</h2>
-    <canvas id="langCanvas"></canvas>
+    <div>
+        {% set color = 333 %}
+        {% for percent in languages.0 %}<div style="width: {{ percent * 100 }}%; height: 30px; display:inline-block; background-color:#{{ color }};"></div>{% set color = color + 333 %}{% endfor %}
+    </div>
 
     <h2>License</h2>
     <table>
         <tr>
             <td>Name</td>
-            <td>Apache License 2.0</td>
-        </tr>
-        <tr>
-            <td>Author</td>
-            <td>Randall Ma</td>
+            <td>{{ license }}</td>
         </tr>
     </table>
 
 </body>
-
-    <script>
-        var c = document.getElementById("langCanvas")
-        var ctx = c.getContext("2d")
-        ctx.font = '30px Droid Serif'
-
-
-        var textWidth = ctx.measureText("JavaScript").width;
-        var maxTextWidth;
-        var textHeightOffset = 30 / 2;
-
-
-        // str, x, y
-        // ctx.fillText('PHP', 0, textYPos)
-
-        // x, y, w, h
-        // ctx.fillRect(textWidth + 10, textHeightOffset, 50, 10)
-
-        var textYPos = 30;
-        {% for lang, value in languages.iteritems() %}
-            ctx.fillText("{{ lang }}", 0, textYPos)
-            ctx.fillStyle = "rgb(200, 200, 200)"
-            ctx.fillRect(textWidth + 10, textYPos - textHeightOffset, 100, 10)
-            ctx.fillStyle = "rgb(0, 0, 0)"
-            ctx.fillRect(textWidth + 10, textYPos - textHeightOffset, {{ value }}, 10)
-            textYPos += 30;
-        {% endfor %}
-
-    </script>
 
 </html>

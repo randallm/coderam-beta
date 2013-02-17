@@ -6,10 +6,29 @@
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
             <script>window.html5 || document.write('<script src="js/vendor/html5shiv.js"><\/script>')</script>
     <![endif]-->
+    <style>
+        * {
+            width: 760px;
+            font-size: 60px;
+            font-family: 'Droid Serif', serif;
+            margin: 0 auto;
+        }
+
+        form {
+            position: absolute;
+            top: 40%;
+        }
+
+        input {
+            outline: none;
+            border: 1px dashed #666;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
     <form action="/s/" method="post">
-        <input type="text" name="search_query">
+        <input type="text" name="search_query" border="0" placeholder="repo or user/repo">
     </form>
 </body>
 </html>
