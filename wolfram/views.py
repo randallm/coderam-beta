@@ -117,13 +117,29 @@ def get_languages(author, project):
     for bytes in r.json().values():
         max_bytes += bytes
 
-    languages = []
-    language_percents = []
+    languages = {}
     for lang, bytes in r.json().iteritems():
-        languages.append(lang)
-        language_percents.append((bytes / float(max_bytes)))
+        languages[lang] = (bytes / float(max_bytes)) * 100
 
-    return (language_percents, languages)
+    return languages
+
+
+# def get_languages(author, project):
+#     r = requests.get('https://api.github.com/repos/' + author + '/' + project + '/languages' + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+
+#     max_bytes = 0
+#     for bytes in r.json().values():
+#         max_bytes += bytes
+
+#     languages = []
+#     language_percents = []
+#     for lang, bytes in r.json().iteritems():
+#         languages.append(lang)
+#         language_percents.append((bytes / float(max_bytes)))
+
+#     languages.reverse()
+#     language_percents.reverse()
+#     return (language_percents, languages)
 
 
 def get_license(author, project):

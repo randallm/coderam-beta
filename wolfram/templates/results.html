@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Coderam Beta</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
     <style>
         body {
             width: 760px;
@@ -35,15 +36,32 @@
         }
 
     </style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 </head>
 <body>
 
     <h1>{{ metadata.name }}</h1>
     <small>{{ metadata.description }}</small>
 
-    <h2>General</h2>
+    <h3>General</h3>
 
     <table>
+        <tr>
+            <td>GitHub</td>
+            <td><a href="{{ metadata.html_url }}">{{ metadata.html_url }}</a></td>
+        </tr>
+        {% if metadata.homepage %}
+        <tr>
+            <td>External Homepage</td>
+            <td><a href="{{ metadata.homepage }}">{{ metadata.html_url }}</a></td>
+        </tr>
+        {% endif %}
+        {% if wikipedia_url %}
+        <tr>
+            <td>Wikipedia</td>
+            <td><a href="{{ wikipedia_url }}">{{ wikipedia_url }}</a></td>
+        </tr>
+        {% endif %}
         <tr>
             <td>Creation Date</td>
             <td>{{ metadata.creation_date }}</td>
@@ -54,45 +72,56 @@
         </tr>
     </table>
 
-    <div>
-        <div class="projectLinks">
-            <a href="{{ metadata.html_url }}">
-                <img src="http://www.levihackwith.com/wp-content/uploads/2011/10/github-logo.png">
-            </a>
-        </div>
-
-        {% if metadata.homepage %}
-        <div class="projectLinks">
-            <a class="projectLinks" href="{{ metadata.homepage }}">
-                <img src="http://i.imgur.com/07G0Ha0.png">
-            </a>
-        </div>
-        {% endif %}
-
-        {% if wikipedia_url %}
-        <div class="projectLinks">
-            <a href="{{ wikipedia_url }}">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png">
-            </a>
-        </div>
-        {% endif %}
-    </div>
-
-    <h2>Commit Activity</h2>
+    <h3>Commit Activity</h3>
 
     <div>
         {% set color = 333 %}
         {# whitespace affects inline-block adding up to 100% #}
-        {% for percent in commits.0 %}{% if percent %}<div style="width:{{ percent * 100 }}%; height:30px; display:inline-block; background-color:#{{ color }}"></div>{% set color = color + 333 %}{% endif %}{% endfor %}
+        {% for percent in commits.0 %}{% if percent %}<div style="width:{{ percent * 100 }}%; height:16px; display:inline-block; background-color:#{{ color }}"></div>{% set color = color + 333 %}{% endif %}{% endfor %}
     </div>
 
-    <h2>Languages</h2>
-    <div>
+    {% if commits.0.0 * 100 %}
+    <div style="width:{{ commits.0.0 * 100 }}%; border-top: 1px solid #333; margin-bottom: .5em">Day</div>
+    {% endif %}
+    {% if commits.0.1 * 100 %}
+    <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) }}%; border-top:1px solid #666; margin-bottom: .5em">Week</div>
+    {% endif %}
+    {% if commits.0.2 * 100 %}
+    <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) + (commits.0.2 * 100) }}%; border-top:1px solid #999; margin-bottom: .5em">Month</div>
+    {% endif %}
+
+
+    <h3>Languages</h3>
+    <canvas id="langCanvas" height=120></canvas>
+
+{#     <div>
         {% set color = 333 %}
         {% for percent in languages.0 %}<div style="width: {{ percent * 100 }}%; height: 30px; display:inline-block; background-color:#{{ color }};"></div>{% set color = color + 333 %}{% endfor %}
     </div>
 
-    <h2>License</h2>
+    {% set color = 333 %}
+    {% set margin_offset = 0 %}
+    {% for perc, lang in zip(languages.0, languages.1) %}
+        <div style="width: {{ perc * 100}}%;border-top:1px solid #{{ color }}; margin-bottom: .5em; margin-left:
+
+        {% for i in range(margin_offset) %}
+            ({{ languages.0.i * 100 }}) +
+        {% endfor %}
+
+        ">{{ lang }}</div>
+    {% set color = color + 333 %}
+    {% endfor %} #}
+
+
+
+{#
+    {% if languages.0.0 %}
+        <div style="width:{{ languages.0.0 * 100 }}%; border-top: 1px solid #333; margin-bottom: .5em">{{ languages.1.0 }}</div>
+    {% endif %}
+    {% if languages.0.1 %}
+        <div style="width:{{ languages.0.1 }}%; border-top: 1px solid #666; margin-bottom: .5em">{{  }}
+ #}
+    <h3>License</h3>
     <table>
         <tr>
             <td>Name</td>
@@ -101,5 +130,33 @@
     </table>
 
 </body>
+
+<script>
+    var c = document.getElementById("langCanvas")
+    var ctx = c.getContext("2d")
+    ctx.font = '16px Droid Serif'
+
+
+    var textWidth = ctx.measureText("JavaScript").width;
+    var maxTextWidth;
+    var textHeightOffset = 10;
+
+    // str, x, y
+    // ctx.fillText('PHP', 0, textYPos)
+
+    // x, y, w, h
+    // ctx.fillRect(textWidth + 10, textHeightOffset, 50, 10)
+
+    var textYPos = 16;
+    {% for lang, value in languages.iteritems() %}
+        ctx.fillText("{{ lang }}", 0, textYPos)
+        ctx.fillStyle = "rgb(153, 153, 153)"
+        ctx.fillRect(textWidth + 10, textYPos - textHeightOffset, 100, 10)
+        ctx.fillStyle = "rgb(51, 51, 51)"
+        ctx.fillRect(textWidth + 10, textYPos - textHeightOffset, {{ value }}, 10)
+        textYPos += 16;
+    {% endfor %}
+
+</script>
 
 </html>
