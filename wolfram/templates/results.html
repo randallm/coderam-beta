@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Coderam Beta</title>
+    <title>{{ metadata.name }} - Coderam Beta</title>
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css" rel="stylesheet">
     <style>
         body {
@@ -87,13 +87,13 @@
     </div>
 
     {% if commits.0.0 * 100 %}
-    <div style="width:{{ commits.0.0 * 100 }}%; border-top: 1px solid #333; margin-bottom: .5em;"><center>Day</center></div>
+    <div style="width:{{ commits.0.0 * 100 }}%; border-top: 1px solid #333; margin-bottom: .5em;"><center id="day">Day ({{ commits.1.0 }})</center></div>
     {% endif %}
     {% if commits.0.1 * 100 %}
-    <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) }}%; border-top:1px solid #666; margin-bottom: .5em;"><center>Week</center></div>
+    <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) }}%; border-top:1px solid #666; margin-bottom: .5em;"><center id="week">Week ({{ commits.1.1 }})</center></div>
     {% endif %}
     {% if commits.0.2 * 100 %}
-    <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) + (commits.0.2 * 100) }}%; border-top:1px solid #999; margin-bottom: .5em;"><center>Month</center></div>
+    <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) + (commits.0.2 * 100) }}%; border-top:1px solid #999; margin-bottom: .5em;"><center>Month ({% if commits.1.2 == 100 %}100+ / Diagram inaccurate{% else %}{{ commits.1.2 }}{% endif %})</center></div>
     {% endif %}
 
 
@@ -161,5 +161,4 @@
     {% endfor %}
 
 </script>
-
 </html>

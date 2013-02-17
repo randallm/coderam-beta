@@ -8,9 +8,13 @@
     <![endif]-->
     <style>
         * {
-            width: 760px;
             font-size: 60px;
             font-family: 'Droid Serif', serif;
+            margin: 0 auto;
+        }
+
+        #container {
+            width: 760px;
             margin: 0 auto;
         }
 
@@ -24,11 +28,28 @@
             border: 1px dashed #666;
             padding: 10px;
         }
+
+        small > a {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
-    <form action="/s/" method="post">
-        <input type="text" name="search_query" border="0" placeholder="repo or user/repo">
-    </form>
+    <a href="https://github.com/randallm/coderam-beta"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
+
+    <div id="container">
+        <form action="/s/" method="post">
+            <input type="text" name="search_query" border="0" placeholder='"repo" or "user/repo"'>
+        </form>
+    </div>
+
+    <center>
+        <small>
+            <a href="javascript:var author=(window.location.href).split('/')[3];var project=(window.location.href).split('/')[4];window.location='http://localhost:5000/s/' + author + '/' + project + '/'">Coderam Beta Bookmarklet for GitHub Project Pages</a>
+        </small>
+    </center>
 </body>
 </html>

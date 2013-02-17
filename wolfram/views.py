@@ -6,6 +6,8 @@ from urllib import quote
 from bs4 import BeautifulSoup
 import datetime
 from dateutil.relativedelta import relativedelta
+import dateutil.parser
+import datetime
 
 
 GH = 'https://api.github.com'
@@ -79,8 +81,7 @@ def get_general_metadata(author, project):
     metadata['description'] = r.json().get('description')
     metadata['html_url'] = r.json().get('html_url')
     metadata['forks'] = r.json().get('forks')
-    metadata['creation_date'] = r.json().get('created_at')
-
+    metadata['creation_date'] = dateutil.parser.parse(r.json().get('created_at')).strftime('%m/%d/%y')
     return metadata
 
 
