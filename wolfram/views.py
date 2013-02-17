@@ -49,10 +49,10 @@ def get_general_metadata(author, project):
     metadata = []
 
     r = requests.get(GH + '/repos/' + author + '/' + project + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
-    metadata['description'] = r.json().get('description')
-    metadata['url'] = r.json().get('html_url')
-    metadata['forks'] = r.json().get('forks')
-    metadata['creation_date'] = r.json().get('created_at')
+    metadata.append(('description', r.json().get('description')))
+    metadata.append(('html_url', r.json().get('html_url')))
+    metadata.append(('forks', r.json().get('forks')))
+    metadata.append(('creation_date', r.json().get('created_at')))
 
     return metadata
 
