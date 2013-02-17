@@ -183,6 +183,8 @@ def get_license(author, project):
 # Repo Activity API
 
 def get_commit_history(author, project):
+    # breaks in very popular repos because github pagination is super confusing
+
     def count_commits(t):
         if t == 'day':
             date_boundary = datetime.datetime.utcnow() - datetime.timedelta(days=1)
