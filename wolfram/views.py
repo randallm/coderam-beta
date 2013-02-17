@@ -58,25 +58,24 @@ def get_general_metadata(author, project):
 
 
 def get_wikipedia_url(project):
-    keywords = ['software', 'server', 'framework', 'programming']
+    keywords = ['server', 'framework', 'programming', 'open source']
 
-    r = requests.Session()
-    r.headers.update({'User-Agent': 'ghbot by randall@randallma.com'})
-    r = r.get('https://en.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=content&format=xml&titles=' + quote(project) + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+    # r = requests.Session()
+    # r.headers.update({'User-Agent': 'ghbot by randall@randallma.com'})
+    r = requests.get('https://en.wikipedia.org/w/api.php?action=query&redirects&prop=revisions&rvprop=content&format=xml&titles=' + quote(project))
 
     if 'disambiguation' in r.text:
-        r2 = requests.Session()
-        r2.headers.update({'User-Agent': 'ghbot by randall@randallma.com'})
-        r2 = r2.get('https://en.wikipedia.org/wiki/' + quote(project) + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+        # r2 = requests.Session()
+        # r2.headers.update({'User-Agent': 'ghbot by randall@randallma.com'})
+        r2 = requests.get('https://en.wikipedia.org/wiki/' + quote(project) + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
 
         soup = BeautifulSoup(r2.text)
         links = soup.find_all('a')
-        links = [link.lower() for link in links]
 
         for link in links:
             for keyword in keywords:
                 if keyword in str(link):
-                    return link['href']
+                    return 'https://en.wikipedia.org' + link['href']
 
     for keyword in keywords:
         if keyword in r.text:
