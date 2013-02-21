@@ -55,7 +55,7 @@
         {% if metadata.homepage %}
         <tr>
             <td>External Homepage</td>
-            <td><a href="{{ metadata.homepage }}">{{ metadata.html_url }}</a></td>
+            <td><a href="{{ metadata.homepage }}">{{ metadata.homepage }}</a></td>
         </tr>
         {% endif %}
         {% if wikipedia_url %}
@@ -78,15 +78,13 @@
         </tr>
     </table>
 
-    {% if bool(commits.0.0) or bool(commits.0.1) or bool(commits.0.2) %}
-    <h3>Commit Activity</h3>
+    <h3>Commit Activity / <a href="{{ metadata.html_url }}/commits/master">History</a></h3>
 
     <div>
         {% set color = 333 %}
         {# whitespace affects inline-block adding up to 100% #}
         {% for percent in commits.0 %}{% if percent %}<div style="width:{{ percent * 100 }}%; height:16px; display:inline-block; background-color:#{{ color }}"></div>{% set color = color + 333 %}{% endif %}{% endfor %}
     </div>
-    {% endif %}
 
     {% if commits.0.0 * 100 %}
     <div style="width:{{ commits.0.0 * 100 }}%; border-top: 1px solid #333; margin-bottom: .5em;"><center id="day">Day ({{ commits.1.0 }})</center></div>
@@ -95,7 +93,7 @@
     <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) }}%; border-top:1px solid #666; margin-bottom: .5em;"><center id="week">Week ({{ commits.1.1 }})</center></div>
     {% endif %}
     {% if commits.0.2 * 100 %}
-    <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) + (commits.0.2 * 100) }}%; border-top:1px solid #999; margin-bottom: .5em;"><center>Month ({% if commits.1.2 == 100 %}100+ / Diagram inaccurate{% else %}{{ commits.1.2 }}{% endif %})</center></div>
+    <div style="width:{{ (commits.0.0 * 100) + (commits.0.1 * 100) + (commits.0.2 * 100) }}%; border-top:1px solid #999; margin-bottom: .5em;"><center>Month ({% if commits.1.2 == 100 %}100+{% else %}{{ commits.1.2 }}{% endif %})</center></div>
     {% endif %}
 
 
