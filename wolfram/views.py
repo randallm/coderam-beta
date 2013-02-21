@@ -11,6 +11,7 @@ import datetime
 
 
 GH = 'https://api.github.com'
+CLIENT_SECRET = app.config['CLIENT_SECRET']
 
 
 @app.route('/', methods=['GET'])
@@ -26,7 +27,7 @@ def search():
 
 
 def get_project(query):
-    r = requests.get('https://api.github.com/legacy/repos/search/' + query + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+    r = requests.get('https://api.github.com/legacy/repos/search/' + query + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
 
     author = r.json().get('repositories')[0].get('owner')
     project = r.json().get('repositories')[0].get('name')
@@ -75,7 +76,7 @@ def specific_search_results(author, project):
 def get_general_metadata(author, project):
     metadata = {}
 
-    r = requests.get(GH + '/repos/' + author + '/' + project + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+    r = requests.get(GH + '/repos/' + author + '/' + project + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
     metadata['name'] = r.json().get('name')
     metadata['homepage'] = r.json().get('homepage')
     metadata['description'] = r.json().get('description')
@@ -95,7 +96,7 @@ def get_wikipedia_url(project):
     if 'disambiguation' in r.text:
         # r2 = requests.Session()
         # r2.headers.update({'User-Agent': 'ghbot by randall@randallma.com'})
-        r2 = requests.get('https://en.wikipedia.org/wiki/' + quote(project) + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+        r2 = requests.get('https://en.wikipedia.org/wiki/' + quote(project) + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
 
         soup = BeautifulSoup(r2.text)
         links = soup.find_all('a')
@@ -112,7 +113,7 @@ def get_wikipedia_url(project):
 
 
 def get_languages(author, project):
-    r = requests.get('https://api.github.com/repos/' + author + '/' + project + '/languages' + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+    r = requests.get('https://api.github.com/repos/' + author + '/' + project + '/languages' + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
 
     max_bytes = 0
     for bytes in r.json().values():
@@ -123,24 +124,6 @@ def get_languages(author, project):
         languages[lang] = (bytes / float(max_bytes)) * 100
 
     return languages
-
-
-# def get_languages(author, project):
-#     r = requests.get('https://api.github.com/repos/' + author + '/' + project + '/languages' + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
-
-#     max_bytes = 0
-#     for bytes in r.json().values():
-#         max_bytes += bytes
-
-#     languages = []
-#     language_percents = []
-#     for lang, bytes in r.json().iteritems():
-#         languages.append(lang)
-#         language_percents.append((bytes / float(max_bytes)))
-
-#     languages.reverse()
-#     language_percents.reverse()
-#     return (language_percents, languages)
 
 
 def get_license(author, project):
@@ -164,17 +147,17 @@ def get_license(author, project):
         else:
             return False
 
-    r = requests.get(GH + '/repos/' + author + '/' + project + '/contents' + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+    r = requests.get(GH + '/repos/' + author + '/' + project + '/contents' + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
     for f in r.json():
         if 'license' in f.get('name').lower():
-            r2 = requests.get(GH + '/repos/' + author + '/' + project + '/contents/' + f.get('name') + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
-            license = b64decode(r2.json().get('content') + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+            r2 = requests.get(GH + '/repos/' + author + '/' + project + '/contents/' + f.get('name') + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
+            license = b64decode(r2.json().get('content') + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
             if check_license(license):
                 return check_license(license)
 
         if 'readme' in f.get('name').lower():
-            r2 = requests.get(GH + '/repos/' + author + '/' + project + '/contents/' + f.get('name') + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
-            license = b64decode(r2.json().get('content') + '?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74')
+            r2 = requests.get(GH + '/repos/' + author + '/' + project + '/contents/' + f.get('name') + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
+            license = b64decode(r2.json().get('content') + '?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET)
             if check_license(license):
                 return check_license(license)
 
@@ -184,92 +167,70 @@ def get_license(author, project):
 # Repo Activity API
 
 def get_commit_history(author, project):
-    # breaks in very popular repos because github pagination is super confusing
 
-    def count_commits(t):
-        if t == 'day':
-            date_boundary = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-        if t == 'week':
-            date_boundary = datetime.datetime.utcnow() - datetime.timedelta(days=7)
-        if t == 'month':
-            date_boundary = datetime.datetime.utcnow() + relativedelta(months=-1)
-        date_boundary = date_boundary.isoformat()
+    class CommitCount(object):
+        def __init__(self):
+            self.day_count = 0
+            self.week_count = 0
+            self.month_count = 0
 
-        url = 'https://api.github.com/repos/' + author + '/' + project + '/commits?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74&since=' + date_boundary + '&page=1&per_page=100'
+        def setup_commit_count_query(self, t):
+            if t == 'day':
+                date_boundary = datetime.datetime.utcnow() - datetime.timedelta(days=1)
+            if t == 'week':
+                date_boundary = datetime.datetime.utcnow() - datetime.timedelta(days=7)
+            if t == 'month':
+                date_boundary = datetime.datetime.utcnow() + relativedelta(months=-1)
+            date_boundary = date_boundary.isoformat()
 
-        r = requests.get(url)
-        return len(r.json())
+            url = 'https://api.github.com/repos/' + author + '/' + project + '/commits?client_id=3952eacd7d6ca4eaefba&client_secret=' + CLIENT_SECRET + '&since=' + date_boundary + '&page=1&per_page=100'
 
-    day = count_commits('day')
-    week = count_commits('week')
-    month = count_commits('month')
+            return url
 
-    commit_values = [day, week, month]
+        # TODO: fix edge case of day/weeks with >100 commits
+        def count_paginated_commits(self, request):
+            try:
+                url = request.links['next']['url']
+                self.month_count += 100
+                self.count_paginated_commits(requests.head(url=url))
+            except KeyError:
+                r = requests.get(request.url)
+                self.month_count += len(r.json())
 
-    total = day + week + month
+    cc = CommitCount()
+
+    day_query = cc.setup_commit_count_query('day')
+    day_r = requests.get(day_query)
+    cc.day_count = len(day_r.json())
+
+    week_query = cc.setup_commit_count_query('week')
+    week_r = requests.get(week_query)
+    cc.week_count = len(week_r.json())
+
+    month_query = cc.setup_commit_count_query('month')
+    month_r = requests.head(url=month_query)
+    if not month_r.links:
+        month_r = requests.get(month_query)
+        cc.month_count = len(month_r.json())
+    else:
+        cc.count_paginated_commits(month_r)
+
+    commit_values = [cc.day_count, cc.week_count, cc.month_count]
+    total = cc.day_count + cc.week_count + cc.month_count
+
     try:
-        day_percentage = float(day) / total
+        day_percentage = float(cc.day_count) / total
     except ZeroDivisionError:
         day_percentage = 0
     try:
-        week_percentage = float(week) / total
+        week_percentage = float(cc.week_count) / total
     except ZeroDivisionError:
         week_percentage = 0
     try:
-        month_percentage = float(month) / total
+        month_percentage = float(cc.month_count) / total
     except ZeroDivisionError:
         month_percentage = 0
 
     commit_percentages = [day_percentage, week_percentage, month_percentage]
 
     return (commit_percentages, commit_values)
-
-# def get_commit_history(author, project):
-#     date_boundary = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-#         # date_boundary = datetime.datetime.utcnow() - datetime.timedelta(days=7)
-#         # date_boundary = datetime.datetime.utcnow() + relativedelta(months=-1)
-#     date_boundary = date_boundary.isoformat()
-
-#     # urls = []
-#     url = 'https://api.github.com/repos/' + author + '/' + project + '/commits?client_id=3952eacd7d6ca4eaefba&client_secret=781f37282c64a1b16460ec574066a59ba41eac74&since=' + date_boundary + '&page=1&per_page=100'
-
-#     # service doesn't support more than 1 page because i won't encounter this during the demo
-
-#     # def scrape_urls(url):
-#         # r = requests.head(url=url)
-#         # if not r.headers['link']:
-#             # urls.append(url)
-#             # return None
-#         # next_page_str_pos = r.headers['link'].find('>; rel="next"')
-#         # if next_page_str_pos == -1:
-#             # return None
-#         # url = r.headers['link'][1:next_page_str_pos]
-#         # print url
-#         # urls.append(url)
-#         # scrape_urls(url)
-
-#     # scrape_urls(url)
-
-#     # for u in urls:
-#     r = requests.get(url)
-#     commits = len(r.json())
-#     return commits
-
-
-#     # day_data = core_work('day')
-#     # week_data = core_work('week')
-#     # month_data = core_work('month')
-
-#     # commit_activity_values.append(day_data)
-#     # commit_activity_values.append(week_data)
-#     # commit_activity_values.append(month_data)
-
-#     # total_data = day_data + week_data + month_data
-
-#     # commit_activity_percentages.append(float(day_data) / total_data)
-#     # commit_activity_percentages.append(float(week_data) / total_data)
-#     # commit_activity_percentages.append(float(month_data) / total_data)
-
-#     # commit_activity.append(commit_activity_percentages)
-#     # commit_activity.append(commit_activity_values)
-#     # return commit_activity
